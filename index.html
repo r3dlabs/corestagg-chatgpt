@@ -153,36 +153,75 @@
         </div>
       </header>
 
-      <div class="grid grid-cols-1 gap-6 xl:grid-cols-[360px_minmax(0,1fr)_380px]">
-        <section class="glass rounded-3xl p-4 shadow-neon">
-          <div class="mb-4 flex items-center justify-between">
+      <div class="flex flex-col gap-6 xl:flex-row">
+        <section id="leftPanel" class="glass rounded-3xl p-4 shadow-neon transition-all duration-300 xl:w-[35%] xl:min-w-[380px] xl:max-w-[560px]">
+          <div class="mb-4 flex items-center justify-between gap-3">
             <div>
-              <h2 class="text-lg font-semibold">Mission Control</h2>
-              <p class="text-sm text-slate-400">GMI endpoint and runtime settings</p>
+              <h2 class="text-lg font-semibold">Control Wing</h2>
+              <p class="text-sm text-slate-400">Boardroom, configuration, and live briefing</p>
             </div>
-            <div class="rounded-full border border-slate-700 px-3 py-1 text-[11px] uppercase tracking-[0.25em] text-slate-400">Secure</div>
+            <button id="toggleLeftPanelBtn" class="rounded-xl border border-slate-700 bg-slate-900/70 px-3 py-2 text-xs font-medium text-slate-200 transition hover:border-sky-400/50 hover:bg-slate-800">
+              Collapse
+            </button>
           </div>
 
-          <div class="space-y-4">
-            <div>
-              <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">API Endpoint</label>
-              <input id="endpointInput" type="text" value="https://api.gmi-serving.com/v1/chat/completions" class="w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60" />
-            </div>
+          <div id="leftPanelContent" class="space-y-4">
+            <section class="rounded-3xl border border-slate-800 bg-slate-950/40 p-4">
+              <div class="mb-4 flex items-center justify-between gap-4">
+                <div>
+                  <h2 class="text-lg font-semibold">Virtual Boardroom</h2>
+                  <p class="text-sm text-slate-400">Hub-and-spoke advisory engine</p>
+                </div>
+                <div class="rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1 text-xs text-slate-400">War Room View</div>
+              </div>
 
-            <div>
-              <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Model</label>
-              <input id="modelInput" type="text" value="zai-org/GLM-5.1-FP8" class="w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60" />
-            </div>
+              <div class="relative mx-auto aspect-square w-full max-w-[640px] overflow-hidden rounded-[2rem] border border-slate-800 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.95),rgba(2,6,23,0.92))] ring">
+                <div class="absolute inset-0 overflow-hidden">
+                  <div class="absolute inset-y-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-scan"></div>
+                </div>
+                <svg id="boardroomSvg" class="absolute inset-0 h-full w-full" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" aria-label="Boardroom Connections"></svg>
+                <div id="boardroomNodes" class="absolute inset-0"></div>
+              </div>
 
-            <div>
-              <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Bearer Token</label>
-              <input id="tokenInput" type="password" placeholder="Paste GMI token" class="hidden-input w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60" />
-              <p class="mt-2 text-xs text-slate-500">Stored locally in your browser only.</p>
-            </div>
+              <div class="mt-4 grid grid-cols-2 gap-2 md:grid-cols-3">
+                <button data-demo="product" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Product</button>
+                <button data-demo="growth" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Growth</button>
+                <button data-demo="fundraising" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Fundraise</button>
+                <button data-demo="legal" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Legal</button>
+                <button data-demo="scale" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Scale</button>
+                <button data-demo="custom" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Suggest Specialists</button>
+              </div>
+            </section>
 
-            <div>
-              <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Founder Directive</label>
-              <textarea id="directiveInput" rows="7" class="scrollbar-thin w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60">You are Soleil, Chief of Staff inside Core Staff in a Box. Your job is to advise startup founders with diplomatic, strategic clarity. You must act as the central orchestrator and consult your specialists when relevant.
+            <section class="rounded-3xl border border-slate-800 bg-slate-950/40 p-4">
+              <div class="mb-4 flex items-center justify-between">
+                <div>
+                  <h2 class="text-lg font-semibold">Mission Control</h2>
+                  <p class="text-sm text-slate-400">GMI endpoint and runtime settings</p>
+                </div>
+                <div class="rounded-full border border-slate-700 px-3 py-1 text-[11px] uppercase tracking-[0.25em] text-slate-400">Secure</div>
+              </div>
+
+              <div class="space-y-4">
+                <div>
+                  <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">API Endpoint</label>
+                  <input id="endpointInput" type="text" value="https://api.gmi-serving.com/v1/chat/completions" class="w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60" />
+                </div>
+
+                <div>
+                  <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Model</label>
+                  <input id="modelInput" type="text" value="zai-org/GLM-5.1-FP8" class="w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60" />
+                </div>
+
+                <div>
+                  <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Bearer Token</label>
+                  <input id="tokenInput" type="password" placeholder="Paste GMI token" class="hidden-input w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60" />
+                  <p class="mt-2 text-xs text-slate-500">Stored locally in your browser only.</p>
+                </div>
+
+                <div>
+                  <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Founder Directive</label>
+                  <textarea id="directiveInput" rows="7" class="scrollbar-thin w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60">You are Soleil, Chief of Staff inside Core Staff in a Box. Your job is to advise startup founders with diplomatic, strategic clarity. You must act as the central orchestrator and consult your specialists when relevant.
 
 Specialists:
 - Elon: engineering feasibility, technical tradeoffs, brutal first-principles thinking.
@@ -200,84 +239,54 @@ Rules:
 6. If the user asks about fundraising or spend, consult Isaac and Harvey.
 7. If the user asks about contracts, regulation, hiring risk, or equity, consult Harvey.
 8. Do not pretend a specialist was consulted unless you explicitly state it in the response.</textarea>
-            </div>
-
-            <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
-              <div class="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Persona Cues</div>
-              <div class="grid grid-cols-1 gap-2 text-sm text-slate-300">
-                <div><span class="text-amber-300">Soleil:</span> diplomatic, strategic, orchestrator</div>
-                <div><span class="text-green-400">Elon:</span> hardcore, blunt, technical</div>
-                <div><span class="text-blue-400">Isaac:</span> ROI-focused, burn-rate obsessed</div>
-                <div><span class="text-pink-400">Steve:</span> narrative-driven, growth hacker</div>
-                <div><span class="text-violet-400">Harvey:</span> precise, risk-averse, protective</div>
-                <div><span class="text-teal-400">Leonardo:</span> systems thinker, scale and structure</div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="glass relative overflow-hidden rounded-3xl p-4 md:p-6">
-          <div class="pointer-events-none absolute inset-0 grid-bg"></div>
-          <div class="relative z-10">
-            <div class="mb-4 flex items-center justify-between gap-4">
-              <div>
-                <h2 class="text-lg font-semibold">Virtual Boardroom</h2>
-                <p class="text-sm text-slate-400">Hub-and-spoke advisory engine</p>
-              </div>
-              <div class="rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1 text-xs text-slate-400">War Room View</div>
-            </div>
-
-            <div class="relative mx-auto aspect-square w-full max-w-[720px] overflow-hidden rounded-[2rem] border border-slate-800 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.95),rgba(2,6,23,0.92))] ring">
-              <div class="absolute inset-0 overflow-hidden">
-                <div class="absolute inset-y-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-scan"></div>
-              </div>
-              <svg id="boardroomSvg" class="absolute inset-0 h-full w-full" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" aria-label="Boardroom Connections"></svg>
-              <div id="boardroomNodes" class="absolute inset-0"></div>
-            </div>
-
-            <div class="mt-4 grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-6">
-              <button data-demo="product" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Product</button>
-              <button data-demo="growth" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Growth</button>
-              <button data-demo="fundraising" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Fundraise</button>
-              <button data-demo="legal" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Legal</button>
-              <button data-demo="scale" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Scale</button>
-              <button data-demo="custom" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Suggest Specialists</button>
-            </div>
-          </div>
-        </section>
-
-        <section class="flex min-h-[700px] flex-col gap-4">
-          <div class="glass rounded-3xl p-4 shadow-neon">
-            <div class="mb-3 flex items-center justify-between">
-              <div>
-                <h2 class="text-lg font-semibold">Boardroom Briefing</h2>
-                <p class="text-sm text-slate-400">Live orchestration trace</p>
-              </div>
-              <button id="clearLogBtn" class="rounded-xl border border-slate-700 bg-slate-900/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-slate-500">Clear Log</button>
-            </div>
-            <div id="briefingLog" class="scrollbar-thin h-56 overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950/70 p-3 text-sm text-slate-300"></div>
-          </div>
-
-          <div class="glass flex min-h-0 flex-1 flex-col rounded-3xl p-4 shadow-neon">
-            <div class="mb-3 flex items-center justify-between">
-              <div>
-                <h2 class="text-lg font-semibold">Founder Channel</h2>
-                <p class="text-sm text-slate-400">Talk to Soleil</p>
-              </div>
-              <div id="statusBadge" class="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-400">Ready</div>
-            </div>
-
-            <div id="chatWindow" class="scrollbar-thin flex-1 space-y-3 overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950/70 p-3"></div>
-
-            <div class="mt-4">
-              <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Your Prompt</label>
-              <textarea id="userInput" rows="5" placeholder="Ask Soleil something like: We need to grow ARR fast without burning runway. What should we do first?" class="scrollbar-thin w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60"></textarea>
-              <div class="mt-3 flex items-center justify-between gap-3">
-                <p class="text-xs text-slate-500">Soleil will consult specialists based on your request and light up the relevant lines.</p>
-                <div class="flex gap-2">
-                  <button id="simulateBtn" class="rounded-xl border border-slate-700 bg-slate-900/70 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-amber-400/50">Simulate Router</button>
-                  <button id="sendBtn" class="rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:opacity-90">Send to Soleil</button>
                 </div>
+
+                <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                  <div class="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Persona Cues</div>
+                  <div class="grid grid-cols-1 gap-2 text-sm text-slate-300">
+                    <div><span class="text-amber-300">Soleil:</span> diplomatic, strategic, orchestrator</div>
+                    <div><span class="text-green-400">Elon:</span> hardcore, blunt, technical</div>
+                    <div><span class="text-blue-400">Isaac:</span> ROI-focused, burn-rate obsessed</div>
+                    <div><span class="text-pink-400">Steve:</span> narrative-driven, growth hacker</div>
+                    <div><span class="text-violet-400">Harvey:</span> precise, risk-averse, protective</div>
+                    <div><span class="text-teal-400">Leonardo:</span> systems thinker, scale and structure</div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <section class="rounded-3xl border border-slate-800 bg-slate-950/40 p-4">
+              <div class="mb-3 flex items-center justify-between">
+                <div>
+                  <h2 class="text-lg font-semibold">Boardroom Briefing</h2>
+                  <p class="text-sm text-slate-400">Live orchestration trace</p>
+                </div>
+                <button id="clearLogBtn" class="rounded-xl border border-slate-700 bg-slate-900/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-slate-500">Clear Log</button>
+              </div>
+              <div id="briefingLog" class="scrollbar-thin h-56 overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950/70 p-3 text-sm text-slate-300"></div>
+            </section>
+          </div>
+        </section>
+
+        <section id="rightPanel" class="glass flex min-h-[780px] min-w-0 flex-1 flex-col rounded-3xl p-4 shadow-neon xl:w-[65%]">
+          <div class="mb-3 flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-semibold">Founder Channel</h2>
+              <p class="text-sm text-slate-400">Talk to Soleil</p>
+            </div>
+            <div id="statusBadge" class="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-400">Ready</div>
+          </div>
+
+          <div id="chatWindow" class="scrollbar-thin flex-1 space-y-3 overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950/70 p-3"></div>
+
+          <div class="mt-4">
+            <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Your Prompt</label>
+            <textarea id="userInput" rows="5" placeholder="Ask Soleil something like: We need to grow ARR fast without burning runway. What should we do first?" class="scrollbar-thin w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60"></textarea>
+            <div class="mt-3 flex items-center justify-between gap-3">
+              <p class="text-xs text-slate-500">Soleil will consult specialists based on your request and light up the relevant lines.</p>
+              <div class="flex gap-2">
+                <button id="simulateBtn" class="rounded-xl border border-slate-700 bg-slate-900/70 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-amber-400/50">Simulate Router</button>
+                <button id="sendBtn" class="rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:opacity-90">Send to Soleil</button>
               </div>
             </div>
           </div>
@@ -285,7 +294,6 @@ Rules:
       </div>
     </div>
   </div>
-
   <script>
     const PERSONAS = {
       soleil: {
@@ -363,7 +371,11 @@ Rules:
       clearBoardroomBtn: document.getElementById('clearBoardroomBtn'),
       fullscreenBtn: document.getElementById('fullscreenBtn'),
       clearLogBtn: document.getElementById('clearLogBtn'),
-      statusBadge: document.getElementById('statusBadge')
+      statusBadge: document.getElementById('statusBadge'),
+      leftPanel: document.getElementById('leftPanel'),
+      leftPanelContent: document.getElementById('leftPanelContent'),
+      toggleLeftPanelBtn: document.getElementById('toggleLeftPanelBtn'),
+      rightPanel: document.getElementById('rightPanel')
     };
 
     const state = {
@@ -371,7 +383,8 @@ Rules:
       nodeEls: {},
       activeTimers: {},
       messages: [],
-      debugFailures: Number(localStorage.getItem(DEBUG_STORAGE_KEY) || '0')
+      debugFailures: Number(localStorage.getItem(DEBUG_STORAGE_KEY) || '0'),
+      leftPanelCollapsed: false
     };
 
     function logBriefing(message, tone = 'info') {
@@ -422,6 +435,26 @@ Rules:
       `;
       refs.chatWindow.appendChild(wrap);
       refs.chatWindow.scrollTop = refs.chatWindow.scrollHeight;
+    }
+
+    function toggleLeftPanel() {
+      state.leftPanelCollapsed = !state.leftPanelCollapsed;
+
+      if (state.leftPanelCollapsed) {
+        refs.leftPanel.classList.remove('xl:w-[35%]', 'xl:min-w-[380px]', 'xl:max-w-[560px]');
+        refs.leftPanel.classList.add('xl:w-[92px]', 'xl:min-w-[92px]', 'overflow-hidden');
+        refs.leftPanelContent.classList.add('hidden');
+        refs.toggleLeftPanelBtn.textContent = 'Expand';
+        refs.toggleLeftPanelBtn.classList.add('w-full');
+        logBriefing('Control Wing collapsed. Founder Channel now has more room.', 'info');
+      } else {
+        refs.leftPanel.classList.remove('xl:w-[92px]', 'xl:min-w-[92px]', 'overflow-hidden');
+        refs.leftPanel.classList.add('xl:w-[35%]', 'xl:min-w-[380px]', 'xl:max-w-[560px]');
+        refs.leftPanelContent.classList.remove('hidden');
+        refs.toggleLeftPanelBtn.textContent = 'Collapse';
+        refs.toggleLeftPanelBtn.classList.remove('w-full');
+        logBriefing('Control Wing expanded.', 'info');
+      }
     }
 
     function saveConfig() {
@@ -772,6 +805,7 @@ Rules:
         logBriefing('Briefing log cleared.', 'info');
       });
       refs.fullscreenBtn.addEventListener('click', toggleFullscreen);
+      refs.toggleLeftPanelBtn.addEventListener('click', toggleLeftPanel);
       refs.sendBtn.addEventListener('click', () => handleSend({ simulateOnly: false }));
       refs.simulateBtn.addEventListener('click', () => handleSend({ simulateOnly: true }));
       refs.userInput.addEventListener('keydown', (event) => {
