@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Core Staff in a Box — Virtual Boardroom</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#050816',
+            panel: '#0b1020',
+            panelSoft: '#11172a',
+            line: '#334155',
+            glow: '#7dd3fc',
+            soleil: '#f59e0b',
+            elon: '#22c55e',
+            isaac: '#60a5fa',
+            steve: '#f472b6',
+            harvey: '#a78bfa',
+            leonardo: '#14b8a6'
+          },
+          boxShadow: {
+            neon: '0 0 0 1px rgba(125,211,252,.18), 0 0 30px rgba(125,211,252,.10)',
+            warm: '0 0 0 1px rgba(245,158,11,.18), 0 0 30px rgba(245,158,11,.14)'
+          },
+          animation: {
+            pulseGlow: 'pulseGlow 1.4s ease-in-out infinite',
+            nodePulse: 'nodePulse 1.8s ease-in-out infinite',
+            scan: 'scan 8s linear infinite'
+          },
+          keyframes: {
+            pulseGlow: {
+              '0%, 100%': { filter: 'drop-shadow(0 0 2px rgba(125,211,252,.25))', opacity: '0.55' },
+              '50%': { filter: 'drop-shadow(0 0 14px rgba(125,211,252,.95))', opacity: '1' }
+            },
+            nodePulse: {
+              '0%,100%': { transform: 'scale(1)' },
+              '50%': { transform: 'scale(1.035)' }
+            },
+            scan: {
+              '0%': { transform: 'translateX(-120%)' },
+              '100%': { transform: 'translateX(120%)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    html, body {
+      background:
+        radial-gradient(circle at top, rgba(34,197,94,0.08), transparent 18%),
+        radial-gradient(circle at bottom right, rgba(96,165,250,0.08), transparent 20%),
+        linear-gradient(180deg, #030712 0%, #050816 100%);
+      min-height: 100%;
+    }
+
+    .glass {
+      background: rgba(11, 16, 32, 0.72);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+    }
+
+    .grid-bg {
+      background-image:
+        linear-gradient(rgba(148,163,184,0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(148,163,184,0.08) 1px, transparent 1px);
+      background-size: 32px 32px;
+      mask-image: radial-gradient(circle at center, black 58%, transparent 100%);
+      -webkit-mask-image: radial-gradient(circle at center, black 58%, transparent 100%);
+    }
+
+    .line-base {
+      stroke: rgba(148,163,184,0.38);
+      stroke-width: 2;
+      stroke-dasharray: 8 10;
+      fill: none;
+      transition: all 0.25s ease;
+    }
+
+    .line-active {
+      stroke: rgba(125,211,252,0.95) !important;
+      stroke-width: 3 !important;
+      filter: drop-shadow(0 0 10px rgba(125,211,252,0.95));
+      animation: dashMove 1.2s linear infinite, pulseLine 1.3s ease-in-out infinite;
+    }
+
+    @keyframes dashMove {
+      from { stroke-dashoffset: 0; }
+      to { stroke-dashoffset: -36; }
+    }
+
+    @keyframes pulseLine {
+      0%,100% { opacity: 0.65; }
+      50% { opacity: 1; }
+    }
+
+    .ring {
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.06),
+        0 0 0 1px rgba(148,163,184,.08),
+        0 10px 30px rgba(0,0,0,.35);
+    }
+
+    .node-active {
+      box-shadow:
+        0 0 0 1px rgba(125,211,252,.28),
+        0 0 26px rgba(125,211,252,.28),
+        0 12px 30px rgba(0,0,0,.35);
+      transform: scale(1.04);
+    }
+
+    .scrollbar-thin::-webkit-scrollbar { width: 8px; height: 8px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.45); }
+    .scrollbar-thin::-webkit-scrollbar-thumb {
+      background: rgba(100, 116, 139, 0.65);
+      border-radius: 9999px;
+    }
+
+    .hidden-input {
+      -webkit-text-security: disc;
+    }
+  </style>
+</head>
+<body class="text-slate-100 selection:bg-sky-400/30">
+  <div class="min-h-screen p-4 md:p-6 lg:p-8">
+    <div class="mx-auto max-w-7xl">
+      <header class="mb-6 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div>
+          <div class="mb-2 inline-flex items-center gap-2 rounded-full border border-slate-700/80 bg-slate-900/70 px-3 py-1 text-xs uppercase tracking-[0.25em] text-sky-300">
+            Founder Edition
+          </div>
+          <h1 class="text-2xl font-semibold tracking-tight md:text-4xl">Core Staff in a Box</h1>
+          <p class="mt-2 max-w-3xl text-sm text-slate-400 md:text-base">
+            A virtual boardroom where <span class="text-amber-300">Soleil</span> orchestrates your executive specialists for strategy, growth, finance, legal, and systems architecture.
+          </p>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+          <button id="saveConfigBtn" class="rounded-xl border border-slate-700 bg-slate-900/70 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-sky-400/50 hover:bg-slate-800">
+            Save Configuration
+          </button>
+          <button id="clearBoardroomBtn" class="rounded-xl border border-slate-700 bg-slate-900/70 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-rose-400/50 hover:bg-slate-800">
+            Clear Boardroom
+          </button>
+          <button id="fullscreenBtn" class="rounded-xl border border-slate-700 bg-gradient-to-r from-slate-800 to-slate-900 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-emerald-400/50 hover:from-slate-700 hover:to-slate-800">
+            Full-Screen War Room
+          </button>
+        </div>
+      </header>
+
+      <div class="grid grid-cols-1 gap-6 xl:grid-cols-[360px_minmax(0,1fr)_380px]">
+        <section class="glass rounded-3xl p-4 shadow-neon">
+          <div class="mb-4 flex items-center justify-between">
+            <div>
+              <h2 class="text-lg font-semibold">Mission Control</h2>
+              <p class="text-sm text-slate-400">GMI endpoint and runtime settings</p>
+            </div>
+            <div class="rounded-full border border-slate-700 px-3 py-1 text-[11px] uppercase tracking-[0.25em] text-slate-400">Secure</div>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">API Endpoint</label>
+              <input id="endpointInput" type="text" value="https://api.gmi-serving.com/v1/chat/completions" class="w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60" />
+            </div>
+
+            <div>
+              <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Model</label>
+              <input id="modelInput" type="text" value="zai-org/GLM-5.1-FP8" class="w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60" />
+            </div>
+
+            <div>
+              <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Bearer Token</label>
+              <input id="tokenInput" type="password" placeholder="Paste GMI token" class="hidden-input w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60" />
+              <p class="mt-2 text-xs text-slate-500">Stored locally in your browser only.</p>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Founder Directive</label>
+              <textarea id="directiveInput" rows="7" class="scrollbar-thin w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60">You are Soleil, Chief of Staff inside Core Staff in a Box. Your job is to advise startup founders with diplomatic, strategic clarity. You must act as the central orchestrator and consult your specialists when relevant.
+
+Specialists:
+- Elon: engineering feasibility, technical tradeoffs, brutal first-principles thinking.
+- Isaac: finance, burn rate, ROI, runway, unit economics, conservative capital protection.
+- Steve: positioning, growth, demand creation, narrative, viral distribution.
+- Harvey: legal, risk, equity protection, compliance, contractual exposure.
+- Leonardo: systems architecture, scale, process design, infrastructure.
+
+Rules:
+1. Stay in brand: this is a serious founder boardroom.
+2. Mention which specialists you consulted when appropriate.
+3. Give concise executive advice first, then tactical next steps.
+4. If the user asks about growth, likely consult Steve and Isaac.
+5. If the user asks about product or technical feasibility, likely consult Elon and Leonardo.
+6. If the user asks about fundraising or spend, consult Isaac and Harvey.
+7. If the user asks about contracts, regulation, hiring risk, or equity, consult Harvey.
+8. Do not pretend a specialist was consulted unless you explicitly state it in the response.</textarea>
+            </div>
+
+            <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+              <div class="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Persona Cues</div>
+              <div class="grid grid-cols-1 gap-2 text-sm text-slate-300">
+                <div><span class="text-amber-300">Soleil:</span> diplomatic, strategic, orchestrator</div>
+                <div><span class="text-green-400">Elon:</span> hardcore, blunt, technical</div>
+                <div><span class="text-blue-400">Isaac:</span> ROI-focused, burn-rate obsessed</div>
+                <div><span class="text-pink-400">Steve:</span> narrative-driven, growth hacker</div>
+                <div><span class="text-violet-400">Harvey:</span> precise, risk-averse, protective</div>
+                <div><span class="text-teal-400">Leonardo:</span> systems thinker, scale and structure</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="glass relative overflow-hidden rounded-3xl p-4 md:p-6">
+          <div class="pointer-events-none absolute inset-0 grid-bg"></div>
+          <div class="relative z-10">
+            <div class="mb-4 flex items-center justify-between gap-4">
+              <div>
+                <h2 class="text-lg font-semibold">Virtual Boardroom</h2>
+                <p class="text-sm text-slate-400">Hub-and-spoke advisory engine</p>
+              </div>
+              <div class="rounded-full border border-slate-700 bg-slate-900/70 px-3 py-1 text-xs text-slate-400">War Room View</div>
+            </div>
+
+            <div class="relative mx-auto aspect-square w-full max-w-[720px] overflow-hidden rounded-[2rem] border border-slate-800 bg-[radial-gradient(circle_at_center,rgba(15,23,42,0.95),rgba(2,6,23,0.92))] ring">
+              <div class="absolute inset-0 overflow-hidden">
+                <div class="absolute inset-y-0 w-1/3 -skew-x-12 bg-gradient-to-r from-transparent via-white/5 to-transparent animate-scan"></div>
+              </div>
+              <svg id="boardroomSvg" class="absolute inset-0 h-full w-full" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid meet" aria-label="Boardroom Connections"></svg>
+              <div id="boardroomNodes" class="absolute inset-0"></div>
+            </div>
+
+            <div class="mt-4 grid grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-6">
+              <button data-demo="product" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Product</button>
+              <button data-demo="growth" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Growth</button>
+              <button data-demo="fundraising" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Fundraise</button>
+              <button data-demo="legal" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Legal</button>
+              <button data-demo="scale" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Demo: Scale</button>
+              <button data-demo="custom" class="demo-btn rounded-xl border border-slate-700 bg-slate-950/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-sky-400/50 hover:text-white">Suggest Specialists</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="flex min-h-[700px] flex-col gap-4">
+          <div class="glass rounded-3xl p-4 shadow-neon">
+            <div class="mb-3 flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-semibold">Boardroom Briefing</h2>
+                <p class="text-sm text-slate-400">Live orchestration trace</p>
+              </div>
+              <button id="clearLogBtn" class="rounded-xl border border-slate-700 bg-slate-900/70 px-3 py-2 text-xs font-medium text-slate-300 transition hover:border-slate-500">Clear Log</button>
+            </div>
+            <div id="briefingLog" class="scrollbar-thin h-56 overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950/70 p-3 text-sm text-slate-300"></div>
+          </div>
+
+          <div class="glass flex min-h-0 flex-1 flex-col rounded-3xl p-4 shadow-neon">
+            <div class="mb-3 flex items-center justify-between">
+              <div>
+                <h2 class="text-lg font-semibold">Founder Channel</h2>
+                <p class="text-sm text-slate-400">Talk to Soleil</p>
+              </div>
+              <div id="statusBadge" class="rounded-full border border-slate-700 px-3 py-1 text-xs text-slate-400">Ready</div>
+            </div>
+
+            <div id="chatWindow" class="scrollbar-thin flex-1 space-y-3 overflow-y-auto rounded-2xl border border-slate-800 bg-slate-950/70 p-3"></div>
+
+            <div class="mt-4">
+              <label class="mb-2 block text-xs font-medium uppercase tracking-[0.2em] text-slate-400">Your Prompt</label>
+              <textarea id="userInput" rows="5" placeholder="Ask Soleil something like: We need to grow ARR fast without burning runway. What should we do first?" class="scrollbar-thin w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-sm text-slate-100 outline-none transition focus:border-sky-400/60"></textarea>
+              <div class="mt-3 flex items-center justify-between gap-3">
+                <p class="text-xs text-slate-500">Soleil will consult specialists based on your request and light up the relevant lines.</p>
+                <div class="flex gap-2">
+                  <button id="simulateBtn" class="rounded-xl border border-slate-700 bg-slate-900/70 px-4 py-2 text-sm font-medium text-slate-100 transition hover:border-amber-400/50">Simulate Router</button>
+                  <button id="sendBtn" class="rounded-xl bg-gradient-to-r from-sky-500 to-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 transition hover:opacity-90">Send to Soleil</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const PERSONAS = {
+      soleil: {
+        name: 'Soleil',
+        title: 'Chief of Staff',
+        color: 'soleil',
+        short: 'CoS',
+        x: 500,
+        y: 500,
+        size: 148,
+        accent: '#f59e0b',
+        summary: 'Diplomatic. Strategic. Orchestrator.'
+      },
+      elon: {
+        name: 'Elon',
+        title: 'Engineering',
+        color: 'elon',
+        short: 'ENG',
+        accent: '#22c55e',
+        summary: 'First principles. Technical feasibility. Brutally direct.'
+      },
+      isaac: {
+        name: 'Isaac',
+        title: 'Finance',
+        color: 'isaac',
+        short: 'FIN',
+        accent: '#60a5fa',
+        summary: 'ROI, burn rate, capital discipline.'
+      },
+      steve: {
+        name: 'Steve',
+        title: 'Marketing',
+        color: 'steve',
+        short: 'MKT',
+        accent: '#f472b6',
+        summary: 'Narrative, growth loops, demand creation.'
+      },
+      harvey: {
+        name: 'Harvey',
+        title: 'Legal',
+        color: 'harvey',
+        short: 'LGL',
+        accent: '#a78bfa',
+        summary: 'Risk control, equity protection, precision.'
+      },
+      leonardo: {
+        name: 'Leonardo',
+        title: 'Architecture',
+        color: 'leonardo',
+        short: 'ARC',
+        accent: '#14b8a6',
+        summary: 'Scale, systems, structure, resilience.'
+      }
+    };
+
+    const SATELLITE_ORDER = ['elon', 'isaac', 'steve', 'harvey', 'leonardo'];
+    const SVG_NS = 'http://www.w3.org/2000/svg';
+    const ACTIVE_TIMEOUT = 3600;
+    const STORAGE_KEY = 'core_staff_boardroom_config_v1';
+    const DEBUG_STORAGE_KEY = 'core_staff_debug_failures_v1';
+
+    const refs = {
+      boardroomSvg: document.getElementById('boardroomSvg'),
+      boardroomNodes: document.getElementById('boardroomNodes'),
+      briefingLog: document.getElementById('briefingLog'),
+      chatWindow: document.getElementById('chatWindow'),
+      endpointInput: document.getElementById('endpointInput'),
+      modelInput: document.getElementById('modelInput'),
+      tokenInput: document.getElementById('tokenInput'),
+      directiveInput: document.getElementById('directiveInput'),
+      userInput: document.getElementById('userInput'),
+      sendBtn: document.getElementById('sendBtn'),
+      simulateBtn: document.getElementById('simulateBtn'),
+      saveConfigBtn: document.getElementById('saveConfigBtn'),
+      clearBoardroomBtn: document.getElementById('clearBoardroomBtn'),
+      fullscreenBtn: document.getElementById('fullscreenBtn'),
+      clearLogBtn: document.getElementById('clearLogBtn'),
+      statusBadge: document.getElementById('statusBadge')
+    };
+
+    const state = {
+      lineEls: {},
+      nodeEls: {},
+      activeTimers: {},
+      messages: [],
+      debugFailures: Number(localStorage.getItem(DEBUG_STORAGE_KEY) || '0')
+    };
+
+    function logBriefing(message, tone = 'info') {
+      const toneMap = {
+        info: 'border-sky-500/20 text-slate-300',
+        warn: 'border-amber-500/20 text-amber-200',
+        error: 'border-rose-500/20 text-rose-200',
+        success: 'border-emerald-500/20 text-emerald-200'
+      };
+      const row = document.createElement('div');
+      row.className = `mb-2 rounded-xl border bg-slate-900/70 px-3 py-2 text-sm ${toneMap[tone] || toneMap.info}`;
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      row.innerHTML = `<div class="mb-1 text-[10px] uppercase tracking-[0.18em] text-slate-500">${time}</div><div>${escapeHtml(message)}</div>`;
+      refs.briefingLog.appendChild(row);
+      refs.briefingLog.scrollTop = refs.briefingLog.scrollHeight;
+    }
+
+    function setStatus(text, style = 'default') {
+      const styleMap = {
+        default: 'border-slate-700 text-slate-400',
+        busy: 'border-amber-500/40 text-amber-200',
+        error: 'border-rose-500/40 text-rose-200',
+        success: 'border-emerald-500/40 text-emerald-200'
+      };
+      refs.statusBadge.className = `rounded-full border px-3 py-1 text-xs ${styleMap[style] || styleMap.default}`;
+      refs.statusBadge.textContent = text;
+    }
+
+    function escapeHtml(str) {
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function addChatMessage(role, content, label = '') {
+      state.messages.push({ role, content, label });
+      const wrap = document.createElement('div');
+      const isUser = role === 'user';
+      wrap.className = `flex ${isUser ? 'justify-end' : 'justify-start'}`;
+      wrap.innerHTML = `
+        <div class="max-w-[88%] rounded-2xl border ${isUser ? 'border-sky-500/30 bg-sky-500/10' : 'border-slate-800 bg-slate-900/80'} px-4 py-3 shadow-sm">
+          <div class="mb-1 text-[11px] font-semibold uppercase tracking-[0.22em] ${isUser ? 'text-sky-300' : 'text-amber-300'}">${escapeHtml(label || (isUser ? 'Founder' : 'Soleil'))}</div>
+          <div class="whitespace-pre-wrap text-sm leading-6 text-slate-200">${escapeHtml(content)}</div>
+        </div>
+      `;
+      refs.chatWindow.appendChild(wrap);
+      refs.chatWindow.scrollTop = refs.chatWindow.scrollHeight;
+    }
+
+    function saveConfig() {
+      const payload = {
+        endpoint: refs.endpointInput.value.trim(),
+        model: refs.modelInput.value.trim(),
+        token: refs.tokenInput.value,
+        directive: refs.directiveInput.value
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      logBriefing('Configuration saved locally for this boardroom.', 'success');
+      setStatus('Configuration Saved', 'success');
+      setTimeout(() => setStatus('Ready', 'default'), 1400);
+    }
+
+    function loadConfig() {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      try {
+        const cfg = JSON.parse(raw);
+        refs.endpointInput.value = cfg.endpoint || refs.endpointInput.value;
+        refs.modelInput.value = cfg.model || refs.modelInput.value;
+        refs.tokenInput.value = cfg.token || '';
+        refs.directiveInput.value = cfg.directive || refs.directiveInput.value;
+      } catch (err) {
+        console.warn('Failed to load saved config', err);
+      }
+    }
+
+    function resetAnimations() {
+      Object.values(state.lineEls).forEach((line) => line.classList.remove('line-active'));
+      Object.values(state.nodeEls).forEach((node) => node.classList.remove('node-active', 'animate-nodePulse'));
+      Object.values(state.activeTimers).forEach((timer) => clearTimeout(timer));
+      state.activeTimers = {};
+    }
+
+    function clearBoardroom() {
+      refs.chatWindow.innerHTML = '';
+      refs.briefingLog.innerHTML = '';
+      refs.userInput.value = '';
+      state.messages = [];
+      resetAnimations();
+      logBriefing('Boardroom reset. Awaiting founder directive.', 'info');
+      setStatus('Ready', 'default');
+      addChatMessage('assistant', 'Boardroom online. I am Soleil, your Chief of Staff. Bring me the problem, and I will route the right specialists.', 'Soleil');
+    }
+
+    function polarToCartesian(cx, cy, radius, angleDeg) {
+      const radians = (angleDeg - 90) * (Math.PI / 180);
+      return {
+        x: cx + radius * Math.cos(radians),
+        y: cy + radius * Math.sin(radians)
+      };
+    }
+
+    function verifySatelliteLayout(coords, minDistance = 190) {
+      for (let i = 0; i < coords.length; i++) {
+        for (let j = i + 1; j < coords.length; j++) {
+          const dx = coords[i].x - coords[j].x;
+          const dy = coords[i].y - coords[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < minDistance) return false;
+        }
+      }
+      return true;
+    }
+
+    function createSvgLine(id, x1, y1, x2, y2) {
+      const line = document.createElementNS(SVG_NS, 'line');
+      line.setAttribute('id', `line-${id}`);
+      line.setAttribute('x1', x1);
+      line.setAttribute('y1', y1);
+      line.setAttribute('x2', x2);
+      line.setAttribute('y2', y2);
+      line.setAttribute('class', 'line-base');
+      return line;
+    }
+
+    function createNodeElement(personaKey, persona) {
+      const node = document.createElement('button');
+      node.type = 'button';
+      node.className = 'absolute -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 bg-slate-950/85 text-center transition duration-300 ring';
+      node.style.width = `${persona.size || 114}px`;
+      node.style.height = `${persona.size || 114}px`;
+      node.style.left = `${persona.x / 10}%`;
+      node.style.top = `${persona.y / 10}%`;
+      node.dataset.persona = personaKey;
+      node.innerHTML = `
+        <div class="flex h-full w-full flex-col items-center justify-center rounded-full border border-white/5 bg-gradient-to-br from-slate-900 to-slate-950 p-2">
+          <div class="mb-1 text-[10px] font-semibold uppercase tracking-[0.3em]" style="color:${persona.accent}">${persona.short}</div>
+          <div class="text-sm font-semibold md:text-base">${persona.name}</div>
+          <div class="mt-1 text-[10px] uppercase tracking-[0.18em] text-slate-400">${persona.title}</div>
+        </div>
+      `;
+      node.addEventListener('click', () => {
+        logBriefing(`Profile opened: ${persona.name} — ${persona.summary}`, 'info');
+        animateConnection(personaKey);
+      });
+      return node;
+    }
+
+    function renderBoardroom() {
+      refs.boardroomSvg.innerHTML = '';
+      refs.boardroomNodes.innerHTML = '';
+      state.lineEls = {};
+      state.nodeEls = {};
+
+      const center = { x: 500, y: 500 };
+      const radius = 330;
+      const angleStart = -90;
+      const step = 360 / SATELLITE_ORDER.length;
+      const coords = [];
+
+      SATELLITE_ORDER.forEach((key, index) => {
+        const angle = angleStart + step * index;
+        const pos = polarToCartesian(center.x, center.y, radius, angle);
+        PERSONAS[key].x = pos.x;
+        PERSONAS[key].y = pos.y;
+        PERSONAS[key].size = 114;
+        coords.push(pos);
+      });
+
+      if (!verifySatelliteLayout(coords)) {
+        logBriefing('[CRITICAL DELAY: INTERRUPT REQUESTED] Satellite overlap detected in radial math.', 'error');
+      }
+
+      SATELLITE_ORDER.forEach((key) => {
+        const line = createSvgLine(key, center.x, center.y, PERSONAS[key].x, PERSONAS[key].y);
+        refs.boardroomSvg.appendChild(line);
+        state.lineEls[key] = line;
+      });
+
+      const centerNode = createNodeElement('soleil', PERSONAS.soleil);
+      centerNode.classList.add('shadow-warm');
+      refs.boardroomNodes.appendChild(centerNode);
+      state.nodeEls.soleil = centerNode;
+
+      SATELLITE_ORDER.forEach((key) => {
+        const node = createNodeElement(key, PERSONAS[key]);
+        refs.boardroomNodes.appendChild(node);
+        state.nodeEls[key] = node;
+      });
+    }
+
+    function animateConnection(personaName) {
+      const line = state.lineEls[personaName];
+      const node = state.nodeEls[personaName];
+      if (!line || !node) return;
+
+      line.classList.add('line-active');
+      node.classList.add('node-active', 'animate-nodePulse');
+
+      if (state.activeTimers[personaName]) clearTimeout(state.activeTimers[personaName]);
+      state.activeTimers[personaName] = setTimeout(() => {
+        line.classList.remove('line-active');
+        node.classList.remove('node-active', 'animate-nodePulse');
+      }, ACTIVE_TIMEOUT);
+    }
+
+    function extractConsultedPersonas(text) {
+      const lower = text.toLowerCase();
+      const map = {
+        elon: ['elon', 'engineering', 'technical', 'feasibility', 'tech'],
+        isaac: ['isaac', 'finance', 'runway', 'burn', 'roi', 'capital', 'unit economics'],
+        steve: ['steve', 'growth', 'marketing', 'narrative', 'viral', 'demand'],
+        harvey: ['harvey', 'legal', 'equity', 'compliance', 'contract', 'risk'],
+        leonardo: ['leonardo', 'architecture', 'scale', 'systems', 'infrastructure', 'structure']
+      };
+      const found = [];
+      Object.entries(map).forEach(([persona, tokens]) => {
+        if (tokens.some((token) => lower.includes(token))) found.push(persona);
+      });
+      return [...new Set(found)];
+    }
+
+    function suggestSpecialistsFromPrompt(prompt) {
+      const p = prompt.toLowerCase();
+      const set = new Set();
+
+      if (/(grow|growth|marketing|brand|narrative|launch|viral|distribution|acquisition|demand)/.test(p)) {
+        set.add('steve');
+        set.add('isaac');
+      }
+      if (/(build|technical|engineering|product|mvp|feature|stack|ai|api|latency|feasibility)/.test(p)) {
+        set.add('elon');
+        set.add('leonardo');
+      }
+      if (/(finance|fundraise|budget|runway|burn|pricing|roi|revenue|margin)/.test(p)) {
+        set.add('isaac');
+      }
+      if (/(legal|contract|terms|equity|compliance|regulation|law|ip|liability)/.test(p)) {
+        set.add('harvey');
+      }
+      if (/(scale|architecture|system|ops|workflow|platform|infrastructure|process)/.test(p)) {
+        set.add('leonardo');
+      }
+      if (!set.size) {
+        set.add('steve');
+        set.add('isaac');
+      }
+      return [...set];
+    }
+
+    function logConsultationFlow(personas) {
+      personas.forEach((persona, idx) => {
+        const delay = idx * 350;
+        setTimeout(() => {
+          logBriefing(`Soleil is consulting ${PERSONAS[persona].name} on ${PERSONAS[persona].title.toLowerCase()} priorities...`, 'info');
+          animateConnection(persona);
+        }, delay);
+      });
+    }
+
+    function buildPayload(userMessage) {
+      const systemPrompt = refs.directiveInput.value.trim();
+      const history = state.messages.slice(-10).map((msg) => ({ role: msg.role, content: msg.content }));
+      return {
+        model: refs.modelInput.value.trim(),
+        messages: [
+          { role: 'system', content: systemPrompt },
+          ...history,
+          { role: 'user', content: userMessage }
+        ],
+        temperature: 0.7,
+        max_tokens: 900
+      };
+    }
+
+    async function callGMI(userMessage) {
+      const endpoint = refs.endpointInput.value.trim();
+      const token = refs.tokenInput.value.trim();
+      if (!endpoint) throw new Error('Missing endpoint.');
+      if (!token) throw new Error('Missing bearer token.');
+
+      const payload = buildPayload(userMessage);
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`HTTP ${response.status}: ${text}`);
+      }
+
+      const data = await response.json();
+      const content = data?.choices?.[0]?.message?.content;
+      if (!content) throw new Error('No message content returned by GMI.');
+      return { data, content };
+    }
+
+    function outputDebugTrace(error) {
+      const payload = {
+        error: String(error?.message || error),
+        endpoint: refs.endpointInput.value.trim(),
+        model: refs.modelInput.value.trim(),
+        messagesPreview: state.messages.slice(-3),
+        timestamp: new Date().toISOString()
+      };
+      const text = `[DEBUG TRACE]\n${JSON.stringify(payload, null, 2)}`;
+      addChatMessage('assistant', text, 'System');
+      logBriefing('Repeated fetch failure threshold reached. Debug trace emitted for human review.', 'error');
+    }
+
+    async function handleSend({ simulateOnly = false } = {}) {
+      const userMessage = refs.userInput.value.trim();
+      if (!userMessage) {
+        logBriefing('Founder prompt is empty. Awaiting instruction.', 'warn');
+        return;
+      }
+
+      addChatMessage('user', userMessage, 'Founder');
+      refs.userInput.value = '';
+      setStatus('Soleil Routing', 'busy');
+
+      const suggested = suggestSpecialistsFromPrompt(userMessage);
+      logBriefing(`Soleil is framing the problem and selecting specialists: ${suggested.map((p) => PERSONAS[p].name).join(', ')}.`, 'info');
+      logConsultationFlow(suggested);
+
+      if (simulateOnly) {
+        const simulated = `Executive read: Your request maps to ${suggested.map((p) => PERSONAS[p].name).join(', ')}. I would consult these specialists first, synthesize their viewpoints, then return a founder-ready recommendation with priorities, tradeoffs, and next steps.`;
+        setTimeout(() => {
+          addChatMessage('assistant', simulated, 'Soleil');
+          setStatus('Simulation Complete', 'success');
+          setTimeout(() => setStatus('Ready', 'default'), 1400);
+        }, 900);
+        return;
+      }
+
+      refs.sendBtn.disabled = true;
+      refs.sendBtn.classList.add('opacity-60', 'cursor-not-allowed');
+
+      try {
+        const result = await callGMI(userMessage);
+        const responseText = typeof result.content === 'string' ? result.content : JSON.stringify(result.content);
+        addChatMessage('assistant', responseText, 'Soleil');
+        const consulted = extractConsultedPersonas(responseText);
+        if (consulted.length) {
+          logBriefing(`Response confirms consultation with: ${consulted.map((p) => PERSONAS[p].name).join(', ')}.`, 'success');
+          consulted.forEach((persona, idx) => setTimeout(() => animateConnection(persona), idx * 220));
+        } else {
+          logBriefing('No named specialists detected in final response. Router used prompt-level specialist inference instead.', 'warn');
+        }
+
+        state.debugFailures = 0;
+        localStorage.setItem(DEBUG_STORAGE_KEY, '0');
+        setStatus('Response Ready', 'success');
+      } catch (error) {
+        state.debugFailures += 1;
+        localStorage.setItem(DEBUG_STORAGE_KEY, String(state.debugFailures));
+        const message = `Soleil could not reach GMI. ${error.message}`;
+        addChatMessage('assistant', message, 'System');
+        logBriefing(message, 'error');
+        setStatus('Connection Error', 'error');
+        if (state.debugFailures > 2) {
+          outputDebugTrace(error);
+        }
+      } finally {
+        refs.sendBtn.disabled = false;
+        refs.sendBtn.classList.remove('opacity-60', 'cursor-not-allowed');
+        setTimeout(() => setStatus('Ready', 'default'), 1600);
+      }
+    }
+
+    async function toggleFullscreen() {
+      try {
+        if (!document.fullscreenElement) {
+          await document.documentElement.requestFullscreen();
+          logBriefing('War Room entered full-screen mode.', 'success');
+        } else {
+          await document.exitFullscreen();
+          logBriefing('War Room exited full-screen mode.', 'info');
+        }
+      } catch (error) {
+        logBriefing(`Fullscreen failed: ${error.message}`, 'error');
+      }
+    }
+
+    function bindEvents() {
+      refs.saveConfigBtn.addEventListener('click', saveConfig);
+      refs.clearBoardroomBtn.addEventListener('click', clearBoardroom);
+      refs.clearLogBtn.addEventListener('click', () => {
+        refs.briefingLog.innerHTML = '';
+        logBriefing('Briefing log cleared.', 'info');
+      });
+      refs.fullscreenBtn.addEventListener('click', toggleFullscreen);
+      refs.sendBtn.addEventListener('click', () => handleSend({ simulateOnly: false }));
+      refs.simulateBtn.addEventListener('click', () => handleSend({ simulateOnly: true }));
+      refs.userInput.addEventListener('keydown', (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
+          handleSend({ simulateOnly: false });
+        }
+      });
+
+      document.querySelectorAll('.demo-btn').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const type = btn.dataset.demo;
+          const examples = {
+            product: 'Can we ship an AI-powered MVP in 30 days without creating a fragile mess?',
+            growth: 'We need faster growth but cannot blow our runway. What channels and positioning should we prioritize?',
+            fundraising: 'How should we think about fundraising versus staying lean for the next 9 months?',
+            legal: 'We are signing our first enterprise customer. What contract and liability issues do we need to watch?',
+            scale: 'Our product may 10x usage soon. What architecture and operating model should we prepare now?',
+            custom: 'Which specialists should Soleil consult for marketplace expansion into a regulated industry?'
+          };
+          refs.userInput.value = examples[type] || examples.custom;
+          refs.userInput.focus();
+          logBriefing(`Demo prompt loaded: ${btn.textContent.trim()}.`, 'info');
+        });
+      });
+    }
+
+    function boot() {
+      loadConfig();
+      renderBoardroom();
+      bindEvents();
+      clearBoardroom();
+      logBriefing('Core Staff in a Box initialized. Soleil is in command.', 'success');
+    }
+
+    boot();
+  </script>
+</body>
+</html>
