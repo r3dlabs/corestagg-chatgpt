@@ -252,6 +252,46 @@ Rules:
                     <div><span class="text-teal-400">Leonardo:</span> systems thinker, scale and structure</div>
                   </div>
                 </div>
+
+                <div class="rounded-2xl border border-slate-800 bg-slate-950/70 p-4">
+                  <div class="mb-3 flex items-center justify-between gap-3">
+                    <div>
+                      <div class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Persona Source Defaults</div>
+                      <div class="mt-1 text-xs text-slate-500">Each persona can start from specific URLs, then enrich with further internet research as needed.</div>
+                    </div>
+                    <button id="loadSourceDefaultsBtn" class="rounded-xl border border-slate-700 bg-slate-900/70 px-3 py-2 text-xs font-medium text-slate-200 transition hover:border-sky-400/50 hover:bg-slate-800">
+                      Load Example URLs
+                    </button>
+                  </div>
+
+                  <div class="space-y-3">
+                    <div>
+                      <label class="mb-1 block text-[11px] font-medium uppercase tracking-[0.18em] text-amber-300">Soleil URLs</label>
+                      <textarea id="sources-soleil" rows="2" placeholder="One URL per line" class="persona-source-input scrollbar-thin w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-xs text-slate-100 outline-none transition focus:border-sky-400/60"></textarea>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-[11px] font-medium uppercase tracking-[0.18em] text-green-400">Elon URLs</label>
+                      <textarea id="sources-elon" rows="2" placeholder="One URL per line" class="persona-source-input scrollbar-thin w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-xs text-slate-100 outline-none transition focus:border-sky-400/60"></textarea>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-[11px] font-medium uppercase tracking-[0.18em] text-blue-400">Isaac URLs</label>
+                      <textarea id="sources-isaac" rows="2" placeholder="One URL per line" class="persona-source-input scrollbar-thin w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-xs text-slate-100 outline-none transition focus:border-sky-400/60"></textarea>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-[11px] font-medium uppercase tracking-[0.18em] text-pink-400">Steve URLs</label>
+                      <textarea id="sources-steve" rows="2" placeholder="One URL per line" class="persona-source-input scrollbar-thin w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-xs text-slate-100 outline-none transition focus:border-sky-400/60"></textarea>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-[11px] font-medium uppercase tracking-[0.18em] text-violet-400">Harvey URLs</label>
+                      <textarea id="sources-harvey" rows="2" placeholder="One URL per line" class="persona-source-input scrollbar-thin w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-xs text-slate-100 outline-none transition focus:border-sky-400/60"></textarea>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-[11px] font-medium uppercase tracking-[0.18em] text-teal-400">Leonardo URLs</label>
+                      <textarea id="sources-leonardo" rows="2" placeholder="One URL per line" class="persona-source-input scrollbar-thin w-full rounded-2xl border border-slate-700 bg-slate-950/90 px-4 py-3 text-xs text-slate-100 outline-none transition focus:border-sky-400/60"></textarea>
+                    </div>
+                  </div>
+                </div>
+                </div>
               </div>
             </section>
 
@@ -375,7 +415,16 @@ Rules:
       leftPanel: document.getElementById('leftPanel'),
       leftPanelContent: document.getElementById('leftPanelContent'),
       toggleLeftPanelBtn: document.getElementById('toggleLeftPanelBtn'),
-      rightPanel: document.getElementById('rightPanel')
+      rightPanel: document.getElementById('rightPanel'),
+      loadSourceDefaultsBtn: document.getElementById('loadSourceDefaultsBtn'),
+      personaSourceInputs: {
+        soleil: document.getElementById('sources-soleil'),
+        elon: document.getElementById('sources-elon'),
+        isaac: document.getElementById('sources-isaac'),
+        steve: document.getElementById('sources-steve'),
+        harvey: document.getElementById('sources-harvey'),
+        leonardo: document.getElementById('sources-leonardo')
+      }
     };
 
     const state = {
@@ -457,12 +506,61 @@ Rules:
       }
     }
 
+    function collectPersonaSources() {
+      const result = {};
+      Object.entries(refs.personaSourceInputs).forEach(([persona, el]) => {
+        result[persona] = el.value
+          .split('\n')
+          .map((line) => line.trim())
+          .filter(Boolean);
+      });
+      return result;
+    }
+
+    function renderPersonaSources(sourceMap = {}) {
+      Object.entries(refs.personaSourceInputs).forEach(([persona, el]) => {
+        el.value = Array.isArray(sourceMap[persona]) ? sourceMap[persona].join('\n') : '';
+      });
+    }
+
+    function loadExamplePersonaSources() {
+      const examples = {
+        soleil: [
+          'https://www.ycombinator.com/library',
+          'https://www.sequoiacap.com/article/'
+        ],
+        elon: [
+          'https://martinfowler.com/',
+          'https://12factor.net/'
+        ],
+        isaac: [
+          'https://www.bvp.com/atlas',
+          'https://www.saastr.com/'
+        ],
+        steve: [
+          'https://www.lennysnewsletter.com/',
+          'https://review.firstround.com/'
+        ],
+        harvey: [
+          'https://www.ycombinator.com/documents',
+          'https://www.cooleygo.com/'
+        ],
+        leonardo: [
+          'https://aws.amazon.com/architecture/',
+          'https://cloud.google.com/architecture'
+        ]
+      };
+      renderPersonaSources(examples);
+      logBriefing('Example persona source URLs loaded into Mission Control.', 'success');
+    }
+
     function saveConfig() {
       const payload = {
         endpoint: refs.endpointInput.value.trim(),
         model: refs.modelInput.value.trim(),
         token: refs.tokenInput.value,
-        directive: refs.directiveInput.value
+        directive: refs.directiveInput.value,
+        personaSources: collectPersonaSources()
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       logBriefing('Configuration saved locally for this boardroom.', 'success');
@@ -479,6 +577,7 @@ Rules:
         refs.modelInput.value = cfg.model || refs.modelInput.value;
         refs.tokenInput.value = cfg.token || '';
         refs.directiveInput.value = cfg.directive || refs.directiveInput.value;
+        renderPersonaSources(cfg.personaSources || {});
       } catch (err) {
         console.warn('Failed to load saved config', err);
       }
@@ -668,13 +767,30 @@ Rules:
       });
     }
 
+    function buildPersonaSourceInstruction(activePersonas, userMessage) {
+      const sourceMap = collectPersonaSources();
+      const relevant = ['soleil', ...activePersonas];
+      const blocks = relevant
+        .map((persona) => {
+          const urls = sourceMap[persona] || [];
+          if (!urls.length) return `- ${PERSONAS[persona]?.name || persona}: no default URLs configured.`;
+          return `- ${PERSONAS[persona]?.name || persona}:\n  ${urls.map((url) => `• ${url}`).join('\n  ')}`;
+        })
+        .join('\n');
+
+      return `Use the following default source URLs as primary reference starting points before giving advice. If the user's question needs fresher or broader evidence, enrich with further internet research beyond these URLs. Be explicit when your answer depends mainly on default URLs versus broader web enrichment.\n\nFounder question:\n${userMessage}\n\nDefault persona URLs:\n${blocks}`;
+    }
+
     function buildPayload(userMessage) {
       const systemPrompt = refs.directiveInput.value.trim();
       const history = state.messages.slice(-10).map((msg) => ({ role: msg.role, content: msg.content }));
+      const activePersonas = suggestSpecialistsFromPrompt(userMessage);
+      const sourceInstruction = buildPersonaSourceInstruction(activePersonas, userMessage);
       return {
         model: refs.modelInput.value.trim(),
         messages: [
           { role: 'system', content: systemPrompt },
+          { role: 'system', content: sourceInstruction },
           ...history,
           { role: 'user', content: userMessage }
         ],
@@ -735,7 +851,12 @@ Rules:
       setStatus('Soleil Routing', 'busy');
 
       const suggested = suggestSpecialistsFromPrompt(userMessage);
+      const sourceMap = collectPersonaSources();
+      const sourceSummary = suggested
+        .map((p) => `${PERSONAS[p].name}: ${(sourceMap[p] || []).length} URL${(sourceMap[p] || []).length === 1 ? '' : 's'}`)
+        .join(' • ');
       logBriefing(`Soleil is framing the problem and selecting specialists: ${suggested.map((p) => PERSONAS[p].name).join(', ')}.`, 'info');
+      logBriefing(`Default source check: ${sourceSummary || 'No persona URLs configured yet'}.`, 'info');
       logConsultationFlow(suggested);
 
       if (simulateOnly) {
@@ -806,6 +927,7 @@ Rules:
       });
       refs.fullscreenBtn.addEventListener('click', toggleFullscreen);
       refs.toggleLeftPanelBtn.addEventListener('click', toggleLeftPanel);
+      refs.loadSourceDefaultsBtn.addEventListener('click', loadExamplePersonaSources);
       refs.sendBtn.addEventListener('click', () => handleSend({ simulateOnly: false }));
       refs.simulateBtn.addEventListener('click', () => handleSend({ simulateOnly: true }));
       refs.userInput.addEventListener('keydown', (event) => {
